@@ -218,6 +218,38 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private String greetingName = "";
     /** Optional time-of-day backdrop (config.xml, sky_intensity); 0 keeps it hidden. */
     private SkyView sky;
+    /** Local change: the Weather add-on's reading (null when weather_provider is empty). */
+    private WeatherNow weatherNow;
+    /** Local change: rain, snow, clouds, fog, lightning, stars over the sky, while Home is in front. */
+    private WeatherView weatherFx;
+    private long weatherPreviewUntil;
+    /** The preview's two minutes are up: back to the real weather at once, not at the next minute's check. */
+    private final Runnable endWeatherPreview = () -> {
+        WeatherView.previewMinute = -1;
+        weatherPreviewUntil = 0;
+        if (weatherNow != null) weatherNow.refresh();
+    };
+
+    /**
+     * Local change: shows one weather for two minutes, for checking the looks over ADB:
+     * {@code am start -n com.gathin.tvhome/.MainActivity --ei weather_preview 63 --ez weather_day false}.
+     */
+    private boolean previewWeatherIfAsked(Intent intent) {
+        if (intent == null || !intent.hasExtra("weather_preview") || weatherFx == null) return false;
+        int code = intent.getIntExtra("weather_preview", -1);
+        boolean day = intent.getBooleanExtra("weather_day", false);
+        // --ei weather_minute 480: where the sun stands at 08:00, for checking mornings and evenings.
+        WeatherView.previewMinute = intent.getIntExtra("weather_minute", -1);
+        weatherPreviewUntil = SystemClock.uptimeMillis() + 120_000;
+        handler.removeCallbacks(endWeatherPreview);
+        handler.postDelayed(endWeatherPreview, 120_000);
+        sky.setWeather(code);
+        weatherFx.setWeather(code, day);
+        TextView line = findViewById(R.id.weatherLine);
+        line.setText("Preview · WMO " + code + (day ? " · day" : " · night"));
+        line.setVisibility(View.VISIBLE);
+        return true;
+    }
     private String vpnApp;
     /** vpn_pill: the VPN shown as its own pill (btnVpn) instead of a badge in the network pill. Off with top_menu. */
     private boolean vpnPill;
@@ -447,6 +479,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
             if (festive) updateWifiLabel();
             sky.update();
+            if (weatherNow != null) weatherNow.refresh();
             wallpaperPlayer.update();
             handler.postDelayed(this, MINUTE_MS);
         }
@@ -517,6 +550,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         wallpaperPlayer = new WallpaperPlayer(this, root, cfg);
         sky = findViewById(R.id.sky);
         sky.setIntensity(cfg.skyIntensity);
+        TextView weatherLine = findViewById(R.id.weatherLine);
+        weatherFx = findViewById(R.id.weatherFx);
+        weatherNow = WeatherNow.create(this, reading -> {
+            if (SystemClock.uptimeMillis() < weatherPreviewUntil) return;   // a preview is on screen
+            sky.setWeather(reading == null ? -1 : reading.code);
+            weatherFx.setWeather(reading == null ? -1 : reading.code, reading == null || reading.day);
+            weatherLine.setText(reading == null ? "" : reading.line);
+            weatherLine.setVisibility(reading == null ? View.GONE : View.VISIBLE);
+        });
+        previewWeatherIfAsked(getIntent());
         glass = findViewById(R.id.glass);
         glass.setStyle(cfg.glassStyle);
         if (festive) glass.setAccent(festival.accentColor());
@@ -1069,6 +1112,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        if (previewWeatherIfAsked(intent)) return;
         if (openLauncherSettingsIfAsked(intent)) return;
         if (openLibraryIfAsked(intent)) return;
         if (openInputsIfAsked(intent)) return;
@@ -1154,6 +1198,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (showStats) startStats();
         if (gameDay != null) gameDay.start();
         sky.update();
+        if (weatherNow != null) weatherNow.start();
+        if (weatherFx != null) weatherFx.start();
         wallpaperPlayer.start();
         handler.postDelayed(minuteTick, MINUTE_MS);
         if (festive && lamp != null) {
@@ -1323,6 +1369,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         super.onPause();
         resumed = false;
         inFront = false;
+        if (weatherNow != null) weatherNow.stop();
+        if (weatherFx != null) weatherFx.stop();
         // No UP reaches a paused Home, so a vendor-key hold it saw go down would still open its app later.
         // Only Home's own share is dropped: a key service that saw the same DOWN keeps its hold.
         RemoteKeys.release(this);

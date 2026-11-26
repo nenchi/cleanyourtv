@@ -346,6 +346,8 @@ final class RemoteKeys {
             case "back": return AccessibilityService.GLOBAL_ACTION_BACK;
             case "home": return AccessibilityService.GLOBAL_ACTION_HOME;
             case "recents": return AccessibilityService.GLOBAL_ACTION_RECENTS;
+            // The system notification panel; on Google TV the system asks launcherx to show its dashboard.
+            case "notifications": return AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS;
             case "sleep": return sdk >= 28 ? AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN : 0;
             default: return 0;
         }
@@ -359,6 +361,7 @@ final class RemoteKeys {
         switch (target) {
             case "back": case "home": case "recents": case "mute": case "sleep":
             case "screensaver": case "settings": case "wifi": case "library": case "ignore":
+            case "notifications":
                 return true;
             default:
                 return false;
@@ -427,6 +430,18 @@ final class RemoteKeys {
      *  switches to that TV input (an HDMI port) instead, an action word runs that action, and a
      *  "package/.Activity" target opens that activity. */
     static void launch(Context ctx, String pkg) {
+        // "later:<target>": open the target 0.1 s after the press and bring it forward again at 0.5 and 0.9 s, on top of whatever the firmware opened for the
+        // same button (Philips GlobalKey hands YouTube/Rakuten to launcherx, which falls back to a Play Store page).
+        if (pkg != null && pkg.startsWith("later:")) {
+            String target = pkg.substring("later:".length()).trim();
+            if (!target.isEmpty()) {
+                android.os.Handler later = new android.os.Handler(Looper.getMainLooper());
+                later.postDelayed(() -> launch(ctx, target), 100);
+                later.postDelayed(() -> launch(ctx, target), 500);
+                later.postDelayed(() -> launch(ctx, target), 900);
+            }
+            return;
+        }
         if (pkg == null || runAction(ctx, pkg)) return;
         if (INPUTS.equals(pkg)) {
             // This launcher's own Inputs menu, as InputsRequestActivity opens it: addressed to Home directly, so a

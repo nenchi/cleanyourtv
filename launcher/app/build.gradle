@@ -15,6 +15,11 @@ android {
         targetSdk 34
         versionCode 15
         versionName '3.6'
+        // Local change: the TV's location for the sky, sun and moon, from the environment at build time
+        // (TV_LATITUDE / TV_LONGITUDE, decimal degrees), so it never lands in a committed file. Unset: empty,
+        // and the sky uses a fixed 07:00-19:00 day.
+        resValue 'string', 'latitude', providers.environmentVariable('TV_LATITUDE').getOrElse('')
+        resValue 'string', 'longitude', providers.environmentVariable('TV_LONGITUDE').getOrElse('')
     }
 
     buildTypes {

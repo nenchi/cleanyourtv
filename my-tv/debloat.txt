@@ -1,0 +1,51 @@
+# Philips 55OLED808 ("Philips Google TV TA1", PH1M_WW_9972, MediaTek), Google TV 12 (SDK 31), build STT2.230831.001
+# Same board and build as examples/philips-55oled708. Wi-Fi, nothing on USB.
+# Applied 2026-11-26 in three batches with a screenshot after each.
+# Kept by choice: Google Assistant (katniss), Chromecast (mediashell, DIAL, setupwraith which holds the Cast
+# credentials), Netflix, firmware updates, Mimi sound, Ambilight, the DVB tuner input, dreamx (screensaver).
+# Stock launcher com.google.android.apps.tv.launcherx stays ENABLED (setupwraith would otherwise take Home).
+#
+# Apply:  TV_HOST=<tv ip> tools/disable.sh my-tv/debloat.txt
+# Undo:   TV_HOST=<tv ip> tools/restore.sh my-tv/debloat.txt
+# Batch 1: TP Vision / Samba / Google telemetry, attribution, auto-installs, promos
+org.droidtv.candeebug                     # "DAC" analytics uploader
+org.droidtv.gel                           # metrics collector in candeebug's process
+org.droidtv.tv.frameworklogger            # reboot reasons / firmware records to the Philips logger
+org.droidtv.customautologservice          # TP Vision log collector
+tv.samba.ssm                              # Samba TV ACR (what is on screen, for ad targeting)
+com.google.android.feedback               # Market Feedback Agent
+com.google.android.partnersetup           # partner referrer / attribution
+com.google.android.onetimeinitializer     # first-setup only
+android.autoinstalls.config.google.gtvpai # partner auto-installs
+com.tpv.nftgallery                        # NFT gallery app
+com.google.android.play.games             # Play Games
+com.google.android.syncadapters.calendar  # calendar sync, no calendar app
+
+# Batch 2: Philips features and preinstalled apps the owner does not use
+com.phorus.playfi.tv                      # Play-Fi multi-room audio app
+com.phorus.playfi.softap                  # Play-Fi soft AP helper
+org.droidtv.amazonalexa                   # Alexa bridge
+org.droidtv.control4app                   # Control4 (four packages)
+org.droidtv.control4adapterservice
+org.droidtv.control4sddp
+org.droidtv.control4UcService
+org.droidtv.matter                        # Matter smart-home bridge
+com.tpv.screenshotshare                   # screenshot sharing
+com.android.printspooler                  # printing
+com.google.android.videos                 # Google TV / Play Movies
+com.vewd.core.browser                     # Vewd browser
+
+# Batch 3: AirPlay and broadcast TV (owner uses neither). DVB tuner input itself kept (firmware re-enables it).
+com.mediatek.AirplayAPK                   # AirPlay (three packages)
+com.mediatek.airplaydaemon
+com.mediatek.partner.airplay_sys
+org.droidtv.hbbtvopapp                    # HbbTV
+org.droidtv.m7opapp                       # M7 satellite operator app
+org.droidtv.astrahdplus                   # HD+ satellite operator app
+org.obs.mhegservice                       # UK MHEG interactive TV
+tv.mopa.ginga                             # Brazilian interactive TV
+org.droidtv.teletext
+org.droidtv.epgdata                       # EPG / Freeview Play
+org.droidtv.ci                            # CI+ module
+org.droidtv.euinstallersat                # satellite channel installer
+org.droidtv.euinstallertc                 # cable/antenna channel installer

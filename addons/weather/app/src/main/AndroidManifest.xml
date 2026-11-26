@@ -7,6 +7,11 @@
     <!-- The only permission: Open-Meteo, for the place search, the weather and the air quality. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- The latest reading for the home screen (NowProvider), for apps signed with the same key only. -->
+    <permission
+        android:name="io.github.sumyabazar1.weather.permission.READ_NOW"
+        android:protectionLevel="signature" />
+
     <application
         android:allowBackup="false"
         android:banner="@drawable/banner"
@@ -30,5 +35,11 @@
             </intent-filter>
             <meta-data android:name="com.gathin.tvhome.card" android:resource="@xml/module_card" />
         </activity>
+
+        <provider
+            android:name=".NowProvider"
+            android:authorities="io.github.sumyabazar1.weather.now"
+            android:exported="true"
+            android:readPermission="io.github.sumyabazar1.weather.permission.READ_NOW" />
     </application>
 </manifest>

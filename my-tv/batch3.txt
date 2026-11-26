@@ -1,0 +1,14 @@
+# Batch 3: AirPlay and broadcast TV (owner uses neither). DVB tuner input itself kept (firmware re-enables it).
+com.mediatek.AirplayAPK                   # AirPlay (three packages)
+com.mediatek.airplaydaemon
+com.mediatek.partner.airplay_sys
+org.droidtv.hbbtvopapp                    # HbbTV
+org.droidtv.m7opapp                       # M7 satellite operator app
+org.droidtv.astrahdplus                   # HD+ satellite operator app
+org.obs.mhegservice                       # UK MHEG interactive TV
+tv.mopa.ginga                             # Brazilian interactive TV
+org.droidtv.teletext
+org.droidtv.epgdata                       # EPG / Freeview Play
+org.droidtv.ci                            # CI+ module
+org.droidtv.euinstallersat                # satellite channel installer
+org.droidtv.euinstallertc                 # cable/antenna channel installer

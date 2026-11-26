@@ -57,6 +57,15 @@ public class SkyView extends View {
         if (intensity > 0) render(true);
     }
 
+    /** Local change: the WMO weather code from the Weather add-on, or -1 for none (the plain time-of-day sky). */
+    private int weatherCode = -1;
+
+    public void setWeather(int code) {
+        if (code == weatherCode) return;
+        weatherCode = code;
+        if (intensity > 0 && getVisibility() == VISIBLE) render(true);
+    }
+
     /** Picks up a new time of day; cheap and safe to call every minute. */
     public void update() {
         if (intensity == 0 || getVisibility() != VISIBLE) return;
@@ -91,6 +100,7 @@ public class SkyView extends View {
 
         int[] sun = sunTimes();
         Sky.Palette sky = sun == null ? Sky.at(minute) : Sky.at(minute, sun[0], sun[1]);
+        if (weatherCode >= 0) sky = Sky.weather(sky, weatherCode);
         if (texture == null) texture = Bitmap.createBitmap(TEX_W, TEX_H, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(texture);
         canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);

@@ -1,0 +1,13 @@
+# Batch 2: Philips features and preinstalled apps the owner does not use
+com.phorus.playfi.tv                      # Play-Fi multi-room audio app
+com.phorus.playfi.softap                  # Play-Fi soft AP helper
+org.droidtv.amazonalexa                   # Alexa bridge
+org.droidtv.control4app                   # Control4 (four packages)
+org.droidtv.control4adapterservice
+org.droidtv.control4sddp
+org.droidtv.control4UcService
+org.droidtv.matter                        # Matter smart-home bridge
+com.tpv.screenshotshare                   # screenshot sharing
+com.android.printspooler                  # printing
+com.google.android.videos                 # Google TV / Play Movies
+com.vewd.core.browser                     # Vewd browser

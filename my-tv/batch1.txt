@@ -1,0 +1,13 @@
+# Batch 1: TP Vision / Samba / Google telemetry, attribution, auto-installs, promos
+org.droidtv.candeebug                     # "DAC" analytics uploader
+org.droidtv.gel                           # metrics collector in candeebug's process
+org.droidtv.tv.frameworklogger            # reboot reasons / firmware records to the Philips logger
+org.droidtv.customautologservice          # TP Vision log collector
+tv.samba.ssm                              # Samba TV ACR (what is on screen, for ad targeting)
+com.google.android.feedback               # Market Feedback Agent
+com.google.android.partnersetup           # partner referrer / attribution
+com.google.android.onetimeinitializer     # first-setup only
+android.autoinstalls.config.google.gtvpai # partner auto-installs
+com.tpv.nftgallery                        # NFT gallery app
+com.google.android.play.games             # Play Games
+com.google.android.syncadapters.calendar  # calendar sync, no calendar app

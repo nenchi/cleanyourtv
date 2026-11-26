@@ -112,6 +112,59 @@ final class Sky {
                 lerp(a.sunX, b.sunX, t));
     }
 
+    // ---- Local change: weather (WMO code from the Weather add-on) ----------------------------------------------
+
+    static final int CLEAR = 0, PARTLY = 1, CLOUDY = 2, FOG = 3, RAIN = 4, SNOW = 5, STORM = 6;
+
+    /** The kind of sky for a WMO weather code. */
+    static int kind(int code) {
+        if (code <= 1) return CLEAR;
+        if (code == 2) return PARTLY;
+        if (code == 45 || code == 48) return FOG;
+        if ((code >= 71 && code <= 77) || code == 85 || code == 86) return SNOW;
+        if (code >= 95) return STORM;
+        if (code >= 51 && code <= 82) return RAIN;
+        return CLOUDY;
+    }
+
+    /**
+     * The time-of-day palette moved toward the weather: each colour is pulled toward the weather's hue at its own
+     * brightness (times {@code bright}), so night stays night and the white text keeps its contrast, and the
+     * sun glow fades behind clouds.
+     */
+    static Palette weather(Palette p, int code) {
+        int tint;
+        float amount, bright, sun, floor;
+        // floor: the least brightness (luma, 0-255) of the bottom colour, so clouds show at night too - city light
+        // on a cloud deck - instead of vanishing into the near-black night sky. The top gets 55 % of it.
+        switch (kind(code)) {
+            case CLEAR: return p;
+            case PARTLY: tint = 0xFF6B7684; amount = 0.45f; bright = 1.00f; sun = 0.70f; floor = 26f; break;
+            case FOG: tint = 0xFF9AA0A6; amount = 0.75f; bright = 1.20f; sun = 0.15f; floor = 52f; break;
+            case RAIN: tint = 0xFF4A6A8A; amount = 0.70f; bright = 0.95f; sun = 0.10f; floor = 34f; break;
+            case SNOW: tint = 0xFFB8C8DA; amount = 0.70f; bright = 1.30f; sun = 0.20f; floor = 50f; break;
+            case STORM: tint = 0xFF5A4A7A; amount = 0.70f; bright = 0.85f; sun = 0.00f; floor = 28f; break;
+            default: tint = 0xFF7A8088; amount = 0.70f; bright = 1.05f; sun = 0.25f; floor = 40f; break;  // overcast
+        }
+        return new Palette(toward(p.top, tint, amount, bright, floor * 0.55f),
+                toward(p.mid, tint, amount, bright, floor * 0.8f),
+                toward(p.bottom, tint, amount, bright, floor), Math.round(p.sun * sun), p.sunX);
+    }
+
+    private static int toward(int colour, int tint, float amount, float bright, float floor) {
+        float want = Math.max(floor, luma(colour) * bright);
+        float have = Math.max(1f, luma(tint));
+        float k = want / have;
+        int r = Math.min(255, Math.round(((tint >> 16) & 0xFF) * k));
+        int g = Math.min(255, Math.round(((tint >> 8) & 0xFF) * k));
+        int b = Math.min(255, Math.round((tint & 0xFF) * k));
+        return lerpColor(colour, 0xFF000000 | (r << 16) | (g << 8) | b, amount);
+    }
+
+    private static float luma(int c) {
+        return 0.2126f * ((c >> 16) & 0xFF) + 0.7152f * ((c >> 8) & 0xFF) + 0.0722f * (c & 0xFF);
+    }
+
     /** Minute of day, 0 to 1439, of a wall clock time. */
     static int minuteOfDay(int hour, int minute) {
         return Math.max(0, Math.min(23, hour)) * 60 + Math.max(0, Math.min(59, minute));
