@@ -3,6 +3,11 @@
 Versions of this TV setup, newest first. Each one is a git tag (`v1.0`, `v1.1`, ...) on the
 `philips-55oled808` branch; README.md, "Versions", says how to make the next one.
 
+## v1.1 (2026-11-27)
+
+- `my-tv/PROMPT.md`: a prompt for an AI assistant to apply this setup to another 55OLED808, asking about the
+  apps to keep, the dock, the remote buttons, the location and the weather.
+
 ## v1.0 (2026-11-27)
 
 First version, on a Philips 55OLED808 (Google TV 12, STT2.230831.001).

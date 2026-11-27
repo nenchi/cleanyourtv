@@ -2,6 +2,12 @@
 
 Philips Google TV TA1, board PH1M_WW_9972, Google TV 12 (SDK 31), build STT2.230831.001. On Wi-Fi.
 
+## Use this setup on another TV
+
+`my-tv/PROMPT.md` is a prompt to paste into an AI coding assistant (Claude Code or similar) on a Windows PC: it
+applies this setup to another Philips 55OLED808, checks the model and firmware first, and asks about the
+apps, the dock, the remote buttons and the location.
+
 ## Versions
 
 Each finished state is a git tag on the `philips-55oled808` branch: `v1.0` is the first. What changed in each
@@ -47,6 +53,7 @@ Needs once on the PC: Python 3, JDK 17 and the Android SDK (platform 34, build-t
 | File | What it is |
 |---|---|
 | `my-tv/setup-tv.ps1` | Redo the whole setup (above) |
+| `my-tv/PROMPT.md` | Prompt for an AI assistant to apply this setup to someone else's TV |
 | `my-tv/CHANGELOG.md` | What changed in each version (v1.0, v1.1, ...) |
 | `my-tv/debloat.txt` | The 37 packages that were **disabled** (never uninstalled), with what each one is |
 | `my-tv/batch1-3.txt` | The same list in the three batches it was applied in |
